@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<title>SQ-Rijo · Verificação de Serviço</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#0F3D2E; --verde-2:#3A8F5C; --verde-3:#E3EFE7; --verde-tinta:#1D5C43;
+  --fundo:#F2F4F3; --papel:#FFFFFF; --papel-2:#F6F8F7; --linha:#DCE3DF; --linha-forte:#C3CEC8;
+  --texto:#1B2A24; --texto-2:#566761; --texto-3:#748580;
+  --cab-borda:#E3E6E4; --cab-ativo:#ECEEED; --cab-texto:#141816;
+  --rec:#2F8552; --ok-fundo:#E3EFE7; --cli:#A36A12; --cli-fundo:#F6ECD9;
+  --serio:#A8492A; --serio-fundo:#F9E8DF; --venc:#A9432D; --venc-fundo:#F7E7E3;
+  --fun:#2F5E8C; --fun-fundo:#E4EDF6;
+  --sans:Barlow,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --cond:"Barlow Semi Condensed",Barlow,"Arial Narrow",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fundo);color:var(--texto);font:16px/23px var(--sans);-webkit-text-size-adjust:100%}
+a{color:var(--verde-tinta)}
+button,input,select,textarea{font:inherit;color:inherit}
+.app{min-height:100vh;display:flex;flex-direction:column;max-width:720px;margin:0 auto;background:var(--fundo)}
+/* Cabeçalho */
+.cab{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--cab-borda);box-shadow:0 1px 3px rgba(17,20,19,.05)}
+.cab-marca{height:56px;display:flex;align-items:center;padding:0 16px;gap:0}
+.cab-marca img{display:block;width:auto}
+.cab-marca .logo{height:30px}.cab-marca .iso{height:30px;margin-left:18px}.cab-marca .pbqph{height:21px;margin-left:8px}
+.cab-marca .esp{flex:1}
+.cab-user{font-size:13px;color:var(--texto-2);text-align:right;line-height:16px}
+.faixa{padding:9px 16px;font-size:14px;line-height:19px;display:flex;gap:10px;align-items:center}
+.faixa.off{background:var(--cli-fundo);color:#6E4A0E}
+.faixa.ok{background:var(--ok-fundo);color:#1F5A38}
+.faixa.erro{background:var(--venc-fundo);color:#8A3524}
+.faixa .esp{flex:1}
+.faixa button{border:0;background:transparent;font-weight:700;text-decoration:underline;color:inherit;min-height:32px}
+main{flex:1;padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:96px}
+/* Navegação inferior */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:5;background:#fff;border-top:1px solid var(--linha);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:4px 8px calc(8px + env(safe-area-inset-bottom))}
+.nav a{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:var(--texto-2);font-size:12px}
+.nav a.ativo{color:var(--verde);font-weight:700}
+.nav svg{width:22px;height:22px}
+@media(min-width:721px){.nav{max-width:720px;margin:0 auto}}
+/* Tipografia */
+h1{margin:0;font:700 26px/30px var(--cond)}
+h2{margin:0;font:600 20px/24px var(--cond)}
+.rotulo{font-size:11.5px;line-height:14px;letter-spacing:.08em;font-weight:600;color:var(--texto-2);text-transform:uppercase}
+.sub{font-size:13px;line-height:18px;color:var(--texto-2)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.cod{font:700 20px/22px var(--cond);color:var(--verde)}
+/* Cartões */
+.cartao{background:var(--papel);border:1px solid var(--linha);border-radius:12px;box-shadow:0 1px 2px rgba(15,61,46,.06)}
+.cartao.pad{padding:14px}
+a.cartao{display:flex;flex-direction:column;gap:4px;padding:12px 14px;text-decoration:none;color:inherit;min-height:48px}
+.linha-tit{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.secao{display:flex;flex-direction:column;gap:8px}
+.vazio{padding:14px;border:1px dashed var(--linha-forte);border-radius:12px;color:var(--texto-2);font-size:14px;text-align:center}
+/* Pílulas */
+.pil{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:1px 10px;font-size:13px;font-weight:600;white-space:nowrap}
+.st-Aprovada{background:var(--ok-fundo);color:var(--rec)}
+.st-Ressalva{background:var(--serio-fundo);color:var(--serio)}
+.st-Reprovada{background:var(--venc-fundo);color:var(--venc)}
+.st-Aberta{background:var(--cli-fundo);color:var(--cli)}
+.st-Ensaio{background:var(--fun-fundo);color:var(--fun)}
+.st-Bloqueada{background:var(--papel-2);color:var(--texto-2)}
+.st-Nada{background:transparent;color:var(--texto-3)}
+.critico{background:var(--venc-fundo);color:var(--venc);border-radius:99px;padding:1px 8px;font-size:12px;font-weight:700}
+/* Formulários */
+label.campo{display:flex;flex-direction:column;gap:6px}
+.campo input,.campo select,.campo textarea{min-height:48px;border:1px solid var(--linha-forte);border-radius:8px;padding:10px 12px;background:#fff;font-size:16px;width:100%}
+.campo textarea{resize:vertical}
+.btn{min-height:48px;border-radius:8px;border:1px solid var(--linha-forte);background:#fff;font-weight:600;font-size:16px;padding:0 16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--texto)}
+.btn.prim{background:var(--verde-2);border-color:var(--verde-2);color:#fff}
+.btn.perigo{color:var(--venc)}
+.btn:disabled{background:var(--linha);border-color:var(--linha);color:var(--texto-2);cursor:not-allowed}
+.btn.bloco{width:100%}
+.barra-acao{position:static;background:#fff;border:1px solid var(--linha);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;box-shadow:0 -2px 12px rgba(15,61,46,.06)}
+/* Itens da FVS */
+.etapas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--linha);border-radius:12px;overflow:hidden;background:#fff}
+.etapas button{min-height:48px;border:0;background:#fff;font-size:15px;color:var(--texto-2);cursor:pointer}
+.etapas button.ativo{background:var(--cab-ativo);color:var(--cab-texto);font-weight:700;box-shadow:inset 0 -2px 0 var(--cab-texto)}
+.item{padding:14px;display:flex;flex-direction:column;gap:10px}
+.item.foco{border:2px solid var(--verde-2)}
+.item.travado{opacity:.75}
+.res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.res.com-ensaio{grid-template-columns:repeat(2,minmax(0,1fr))}
+.res button{min-height:52px;border-radius:8px;border:1px solid var(--linha-forte);background:#fff;font-weight:700;font-size:15px;cursor:pointer}
+.res button[aria-pressed=true].C{border:2px solid var(--rec);background:var(--ok-fundo);color:#1F6B40}
+.res button[aria-pressed=true].NC{border:2px solid var(--venc);background:var(--venc-fundo);color:var(--venc)}
+.res button[aria-pressed=true].NA{border:2px solid var(--texto-2);background:var(--papel-2)}
+.res button[aria-pressed=true].AE{border:2px solid var(--fun);background:var(--fun-fundo);color:var(--fun)}
+.res button.NC{color:var(--venc)}
+.fotos{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fotos img,.fotos .ph{width:72px;height:72px;border-radius:8px;object-fit:cover;background:var(--linha)}
+.add-foto{width:72px;height:72px;border-radius:8px;border:1px dashed var(--texto-3);background:var(--papel-2);color:var(--verde-tinta);font-size:12px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+.progresso{height:6px;background:var(--linha);border-radius:99px;overflow:hidden}
+.progresso div{height:100%;background:var(--verde-2)}
+/* Mapa */
+.mapa-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--linha);background:#fff}
+table.mapa{border-collapse:collapse;font-size:12.5px;min-width:100%}
+table.mapa th,table.mapa td{padding:6px 4px;text-align:center;border-top:1px solid var(--linha)}
+table.mapa thead th{background:var(--papel-2);border-top:0;font-weight:600;color:var(--texto-2);vertical-align:bottom}
+table.mapa th.loc{text-align:left;padding:8px 12px;position:sticky;left:0;background:#fff;white-space:nowrap;font-weight:600;color:var(--texto)}
+table.mapa thead th.loc{background:var(--papel-2)}
+table.mapa td a{display:inline-flex;min-width:74px;justify-content:center;text-decoration:none;font-size:11.5px;padding:3px 6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-height:36px;padding:0 12px;border-radius:99px;border:1px solid var(--linha-forte);background:#fff;font-size:14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--verde-3);border-color:var(--verde);color:var(--verde);font-weight:600}
+.aviso{border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:19px}
+.aviso.erro{background:var(--venc-fundo);color:#8A3524}
+.aviso.info{background:var(--fun-fundo);color:#1F3F60}
+.aviso.ok{background:var(--ok-fundo);color:#1F5A38}
+.aviso svg{flex-shrink:0;width:20px;height:20px;margin-top:1px}
+ul.lista{list-style:none;margin:0;padding:0}
+ul.lista li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--linha)}
+ul.lista li:first-child{border-top:0}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#1B2A24;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:20;max-width:90vw;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.mostra{opacity:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="cab">
+    <div class="cab-marca">
+      <img class="logo" id="img-logo" alt="Rijo Engenharia">
+      <img class="iso" id="img-iso" alt="ISO 9001:2015">
+      <img class="pbqph" id="img-pbqph" alt="PBQP-H">
+      <div class="esp"></div>
+      <div class="cab-user" id="cab-user"></div>
+    </div>
+    <div id="faixa"></div>
+  </header>
+  <main id="view" aria-live="polite"></main>
+  <nav class="nav" aria-label="Navegação">
+    <a href="#/" data-nav="pend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Pendências</a>
+    <a href="#/mapa" data-nav="mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Mapa</a>
+    <a href="#/abrir" data-nav="abrir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Abrir FVS</a>
+    <a href="#/sync" data-nav="sync"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></svg><span id="nav-sync">Sincronizar</span></a>
+  </nav>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<input type="file" id="arq-foto" accept="image/*" capture="environment" class="sr" tabindex="-1" aria-hidden="true">
+
+<script src="config.js"></script>
+<script src="marca.js"></script>
+<script>
+  // Carrega os dados de demonstração só no modo demo.
+  if (!window.SQ_CONFIG || !window.SQ_CONFIG.API_URL || window.SQ_CONFIG.API_URL === 'demo') {
+    document.write('<script src="demo-dados.js"><\/script>');
+  }
+</script>
+<script src="app.js"></script>
+</body>
+</html>
